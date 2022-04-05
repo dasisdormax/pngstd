@@ -159,17 +159,8 @@ where R: Read {
         while chunk_type == info.r#type() {
             let size = info.size() as usize;
             let mut buf = vec![0; size];
-            let mut pos: usize = 0;
             // Read chunk data
-            while pos < size {
-                let bytes = self.reader.read(&mut buf[pos..])?;
-                if bytes == 0 {
-                    return Err(io::Error::new(io::ErrorKind::Other, 
-                        format!("Error reading chunk, size is {}", bytes)
-                    ));
-                }
-                pos += bytes;
-            }
+            self.reader.read_exact(&mut buf)?;
             // Validate checksum
             let mut hasher = Hasher::new();
             hasher.update(info.raw_type());
